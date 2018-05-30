@@ -10,26 +10,27 @@ use Illuminate\Database\Eloquent\Builder as IlluminateBuilder;
 class Builder extends IlluminateBuilder
 {
     /**
-     * @param string|array $column
+     * @param string|array $criteria
      * @param array $sortable
      *
      * @return $this
      */
-    public function sortBy($column, array $sortable)
+    public function sortBy($criteria, array $sortable)
     {
-        $columns = (! is_array($column)) ? explode(',', $column) : $column;
+        if (is_string($criteria)) {
+            $criteria = explode(',', $criteria);
+        }
 
-        $columns = collect($columns)->filter(function ($value) {
+        $criteria = collect($criteria)->filter(function ($value) {
             return !empty($value);
         });
 
-        foreach ($columns as $attribute) {
+        foreach ($criteria as $attribute) {
             $direction = (0 === strpos($attribute, '-')) ? 'desc' : 'asc';
 
             $attribute = str_replace_first('-', '', $attribute);
             
-            if (in_array($attribute, $sortable)
-            ) {
+            if (in_array($attribute, $sortable)) {
                 $this->orderBy($attribute, $direction);
             }
         }
@@ -149,8 +150,9 @@ class Builder extends IlluminateBuilder
 
         $perPage = $perPage ?: Paginator::resolveCurrentLimit($limitName);
 
-        $perPage = (null === $perPage ||
-            ! in_array($perPage, $this->model->getLimits())
+        $perPage = (
+            null === $perPage ||
+            $perPage > $this->model->getLimit()
         ) ? $this->model->getPerPage() : $perPage;
 
         $results = ($total = $this->toBase()->getCountForPagination())
@@ -191,8 +193,9 @@ class Builder extends IlluminateBuilder
 
         $perPage = $perPage ?: Paginator::resolveCurrentLimit($limitName);
 
-        $perPage = (null === $perPage ||
-            ! in_array($perPage, $this->model->getLimits())
+        $perPage = (
+            null === $perPage ||
+            $perPage > $this->model->getLimit()
         ) ? $this->model->getPerPage() : $perPage;
 
         // Next we will set the limit and offset for this query so that when we get the

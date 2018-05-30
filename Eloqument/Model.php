@@ -8,13 +8,11 @@ use Illuminate\Database\Eloquent\Model as IlluminateModel;
 abstract class Model extends IlluminateModel
 {
     /**
-     * The variants of number to return for pagination.
+     * The limit of number to return for pagination.
      *
      * @var int
      */
-    protected $limits = [
-        1, 5, 10, 15, 20, 25, 50,
-    ];
+    protected $limit = 50;
 
     /**
      * The number of models to return for pagination.
@@ -24,20 +22,13 @@ abstract class Model extends IlluminateModel
     protected $perPage = 25;
 
     /**
-     * The attributes that sorting.
-     *
-     * @var array
-     */
-    protected $sortable = [];
-
-    /**
-     * Get the variants of number to return per page.
+     * Get the limit of number to return per page.
      *
      * @return int
      */
-    public function getLimits()
+    public function getLimit()
     {
-        return $this->limits;
+        return $this->limit;
     }
 
     /**
